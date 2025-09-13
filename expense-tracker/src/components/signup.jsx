@@ -24,8 +24,8 @@ export function SignupPage() {
             const data = await res.json();
             setMessage(data.msg);
 
-            if (res.ok) {
-                navigate("/LoginPage")
+            if (res.ok && data.msg === "User signed up, login using the same credentials...") {
+                navigate("/Login")
             }
         }catch(err) {
             setMessage("Error fetching the data...")
@@ -34,7 +34,7 @@ export function SignupPage() {
 
 
     async function LoginPage () {
-        navigate("/LoginPage")
+        navigate("/Login")
     }
 
 
@@ -52,7 +52,8 @@ export function SignupPage() {
             <br />
             <input type="text" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
             <br /><br />
-
+            {message && <p>{message}</p>}
+            <br /><br />
             <button onClick={handleInput}>Submit</button>
             <button onClick={LoginPage}>Login</button>
         </div>

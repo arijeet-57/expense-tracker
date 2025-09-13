@@ -11,10 +11,9 @@ app.use(express.json());
 
 
 
-//Singup route
+//Signup route
 app.post("/signup", async function(req,res) {
     const {username, password} = req.body;
-
     try{
         const existingUser = await User.findOne({username});
         if(existingUser) {
@@ -22,19 +21,16 @@ app.post("/signup", async function(req,res) {
                 msg: "User already exists, try logging in..."
             })
         }
-
         const hashed = await bcrypt.hash(password, 10);
         const newUser = new User({username, password: hashed});
         await newUser.save();
-
     }catch(err){
     return res.status(500).json({
             msg: "Server side error..."
         })
     }
-
     res.json({
-        msg: "User signed up, login using the same credentials..."
+        msg: "User signed up..."
     })
 })
 
@@ -43,7 +39,6 @@ app.post("/signup", async function(req,res) {
 //Login route
 app.post("/login", async function(req, res) {
     const {username, password} = req.body;
-    
     try {
     const existingUser = await User.findOne({username});
     if(!existingUser) {
@@ -51,18 +46,18 @@ app.post("/login", async function(req, res) {
             msg: "Signup first..user does not exist..."
         })
     }
-
     const isMatch = await bcrypt.compare(password, existingUser.password);
     if(!isMatch) {
         return res.json({
             msg:"Password is incorrect..."
         })
     }
-    
+
     const token = jwt.sign({id: existingUser._id} , "secret1", {expiresIn: "1h"});
-
-    res.json({token})
-
+    res.json({
+        msg: "User logged in",
+        token
+    })
     } catch (err) {
      return res.status(500).json({
             msg: "Server side error..."
