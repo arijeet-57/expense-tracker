@@ -24,7 +24,7 @@ export function SignupPage() {
             const data = await res.json();
             setMessage(data.msg);
 
-            if (res.ok && data.msg === "User signed up, login using the same credentials...") {
+            if (res.ok && data.msg === "User signed up...") {
                 navigate("/Login")
             }
         }catch(err) {

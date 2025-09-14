@@ -26,7 +26,7 @@ export function LoginPage() {
 
             if (res.ok && data.token) {
                 localStorage.setItem("token", data.token);
-                navigate("/Expense");
+                navigate("/Expenses");
             }
         }catch(err) {
             setMessage("Error fetching the data...")

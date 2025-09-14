@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const { User } = require("../database/db.cjs");
+const { User, Expense } = require("../database/db.cjs");
 const jwt = require ("jsonwebtoken");
 const bcrypt = require ("bcrypt");
+const moment = require ("moment-timezone");
 
 const app = express();
 
@@ -65,6 +66,46 @@ app.post("/login", async function(req, res) {
     }
 })
 
+
+
+//TOken verification middlware
+function authenticateToken() {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if(!token) {
+        return res.json({ msg: "NO token...."})
+    }
+
+    jwt.verify(token, "secret1", (err, User) => {
+        if(err) return res.json({msg: "Invalid token...."})
+        req.User = User;
+        next();
+    })
+}
+
+
+//Expense tracking route
+app.post("/expenses" ,authenticateToken, async function(req, res) {
+    const  {category, expense, date} = req.body;
+    const isNow = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
+    try {
+        const expenseTrack = new Expense({
+            username: req.User.username,
+            category,
+            expense,
+            date : isNow,
+        })
+        await expenseTrack.save();
+        res.json({
+            msg: "Expense saved successfully..."
+        })
+    }catch(err){
+        res.json({
+            msg: "Error in server side..."
+        })
+    }
+})
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
